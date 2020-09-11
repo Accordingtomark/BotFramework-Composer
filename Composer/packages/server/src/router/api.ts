@@ -14,6 +14,7 @@ import { FormDialogController } from '../controllers/formDialog';
 import * as ExtensionsController from '../controllers/extensions';
 
 import { UtilitiesController } from './../controllers/utilities';
+import { ImportController } from '../controllers/import';
 
 const router: Router = express.Router({});
 
@@ -81,6 +82,9 @@ router.get('/extensions/search', ExtensionsController.searchExtensions);
 router.get('/extensions/:id/:bundleId', ExtensionsController.getBundleForView);
 // proxy route for extensions (allows extension client code to make fetch calls using the Composer server as a proxy -- avoids browser blocking request due to CORS)
 router.post('/extensions/proxy/:url', ExtensionsController.performExtensionFetch);
+
+// importing
+router.post('/import/:source', ImportController.startImport);
 
 const errorHandler = (handler: RequestHandler) => (req: Request, res: Response, next: NextFunction) => {
   Promise.resolve(handler(req, res, next)).catch(next);

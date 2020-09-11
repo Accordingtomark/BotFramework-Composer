@@ -47,6 +47,16 @@ if (app.isPackaged) {
 log(`${process.env.NODE_ENV} environment detected.`);
 
 function processArgsForWindows(args: string[]): string {
+  const envId = '40c6f77b-8fc6-4bbd-9bdc-2d4a941ef0b8';
+  const botId = '8e2f2bff-7534-45b2-9343-2aa12e12af98';
+  const payload = {
+    botId,
+    description: 'This describes my PVA bot :)',
+    envId,
+    name: 'my-pva-bot',
+    tenantId: '72f988bf-86f1-41af-91ab-2d7cd011db47',
+  };
+  args.push(`bfcomposer://import?source=pva&payload=${encodeURIComponent(JSON.stringify(payload))}`);
   const deepLinkUrl = args.find((arg) => arg.startsWith(composerProtocol));
   if (deepLinkUrl) {
     return parseDeepLinkUrl(deepLinkUrl);
@@ -153,7 +163,7 @@ async function loadServer() {
 
   log('Starting server...');
   const { start } = await import('@bfc/server');
-  serverPort = await start();
+  serverPort = await start({ getAccessToken, loginAndGetIdToken });
   log(`Server started at port: ${serverPort}`);
 }
 
