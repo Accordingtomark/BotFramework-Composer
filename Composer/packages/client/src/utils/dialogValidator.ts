@@ -14,7 +14,7 @@ export const isRegExRecognizerType = (dialog: DialogInfo | undefined) => {
 export const isLUISnQnARecognizerType = (dialog: DialogInfo | undefined) => {
   if (!dialog) return false;
   const recognizer = get(dialog, 'content.recognizer', '');
-  return recognizer && recognizer.$kind && recognizer.$kind.includes('Virtual'); //typeof recognizer === 'string' && recognizer.endsWith('.lu'); //.qna');
+  return typeof recognizer === 'string' && recognizer.endsWith('.lu.qna');
 };
 
 export const containUnsupportedTriggers = (dialog: DialogInfo | undefined) => {
