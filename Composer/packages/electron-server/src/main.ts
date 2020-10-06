@@ -51,9 +51,9 @@ function processArgsForWindows(args: string[]): string {
   const botId = '8e2f2bff-7534-45b2-9343-2aa12e12af98';
   const payload = {
     botId,
-    description: 'This describes my PVA bot :)',
+    description: 'A bot that reports the current weather.',
     envId,
-    name: 'my-pva-bot',
+    name: 'toanzian-test-bot1',
     tenantId: '72f988bf-86f1-41af-91ab-2d7cd011db47',
   };
   args.push(`bfcomposer://import?source=pva&payload=${encodeURIComponent(JSON.stringify(payload))}`);
