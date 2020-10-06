@@ -50,7 +50,11 @@ export class PowerVirtualAgentsProvider extends ExternalContentProvider {
         ensureDirSync(this.tempBotAssetsDir);
         const zipPath = join(this.tempBotAssetsDir, 'bot-assets.zip');
         const writeStream = createWriteStream(zipPath);
-        result.body.pipe(writeStream);
+        await new Promise((resolve, reject) => {
+          writeStream.once('finish', resolve);
+          writeStream.once('error', reject);
+          result.body.pipe(writeStream);
+        });
         return { eTag, zipPath };
       } else {
         throw 'Response containing zip does not have a body';
