@@ -14,6 +14,12 @@ const config: PluginConfig = {
     },
   },
   uiSchema: {
+    // @ts-ignore
+    ['Microsoft.VirtualAgents.Recognizer']: {
+      recognizer: {
+        intentEditor: LuisIntentEditor,
+      },
+    },
     [SDKKinds.LuisRecognizer]: {
       recognizer: {
         disabled: true,
