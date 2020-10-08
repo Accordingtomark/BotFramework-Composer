@@ -1,6 +1,7 @@
 import { IBotProject } from '@bfc/shared';
 import { join } from 'path';
 import { createReadStream, createWriteStream } from 'fs';
+import { ensureDirSync, remove } from 'fs-extra';
 import fetch from 'node-fetch';
 
 import {
@@ -11,6 +12,7 @@ import {
   UserIdentity,
   PublishState,
   PublishHistory,
+  PullResponse,
 } from './types';
 
 const API_VERSION = '1';
@@ -49,9 +51,10 @@ export const publish = async (
     const accessToken = await getAccessToken({ ...authCredentials, idToken });
 
     // where we will store the bot .zip
-    const zipPath = join(__dirname, 'bot.zip');
+    const zipDir = join(process.env.COMPOSER_TEMP_DIR as string, 'pva-publish');
+    ensureDirSync(zipDir);
+    const zipPath = join(zipDir, 'bot.zip');
 
-    console.log('writing bot zip to :', zipPath);
     // write the .zip to disk
     const zipWriteStream = createWriteStream(zipPath);
     await new Promise((resolve, reject) => {
@@ -108,6 +111,8 @@ export const publish = async (
     const botProjectId = project.id;
     ensurePublishProfileHistory(botProjectId, profileName);
     publishHistory[botProjectId][profileName].unshift(result);
+
+    remove(zipDir); // clean up zip -- fire and forget
 
     return {
       status: result.status,
@@ -224,11 +229,21 @@ export const history = async (
     });
     const jobs: PVAPublishJob[] = await res.json();
 
-    // TODO (toanzian): only show n-most recent jobs?
-    return jobs.map((job) => xformJobToResult(job));
+    // return the first 20
+    return jobs.map((job) => xformJobToResult(job)).slice(19);
   } catch (e) {
     return [];
   }
+};
+
+export const pull = async (
+  config: PublishConfig,
+  _project: IBotProject,
+  _user: UserIdentity,
+  { getAccessToken, loginAndGetIdToken }
+): Promise<PullResponse> => {
+  // go get an access token
+  return undefined;
 };
 
 const xformJobToResult = (job: PVAPublishJob): PublishResult => {
