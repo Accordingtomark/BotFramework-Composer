@@ -27,6 +27,7 @@
     "@bfc/extension-client": "file:../../packages/extension-client",
     "@uifabric/icons": "7.3.59",
     "@uifabric/react-hooks": "7.4.12",
+    "fs-extra": "^9.0.1",
     "office-ui-fabric-react": "7.121.11",
     "react": "^16.13.0",
     "react-dom": "^16.13.0"

@@ -2,7 +2,7 @@ import { IBotProject } from '@bfc/shared';
 import { join } from 'path';
 import { createReadStream, createWriteStream } from 'fs';
 import { ensureDirSync, remove } from 'fs-extra';
-import fetch from 'node-fetch';
+import fetch, { RequestInit } from 'node-fetch';
 
 import {
   PVAPublishJob,
@@ -242,8 +242,53 @@ export const pull = async (
   _user: UserIdentity,
   { getAccessToken, loginAndGetIdToken }
 ): Promise<PullResponse> => {
-  // go get an access token
-  return undefined;
+  const {
+    // these are specific to the PVA publish profile shape
+    botId,
+    envId,
+    tenantId,
+  } = config;
+  try {
+    // authenticate with PVA
+    const idToken = await loginAndGetIdToken(authCredentials);
+    const accessToken = await getAccessToken({ ...authCredentials, idToken });
+    // fetch zip
+    const url = `${BASE_URL}/api/botmanagement/v1/environments/${envId}/bots/${botId}/composer/content`;
+    const options: RequestInit = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'X-CCI-TenantId': tenantId,
+        'X-CCI-Routing-TenantId': tenantId,
+      },
+    };
+    const result = await fetch(url, options);
+
+    const eTag = result.headers.get('etag') || '';
+    const contentType = result.headers.get('content-type');
+    if (!contentType || contentType !== 'application/zip') {
+      throw 'Invalid content type header! Must be application/zip';
+    }
+
+    // write the zip to disk
+    if (result && result.body) {
+      // where we will store the bot .zip
+      const zipDir = join(process.env.COMPOSER_TEMP_DIR as string, 'pva-publish');
+      ensureDirSync(zipDir);
+      const zipPath = join(zipDir, 'bot-assets.zip');
+      const writeStream = createWriteStream(zipPath);
+      await new Promise((resolve, reject) => {
+        writeStream.once('finish', resolve);
+        writeStream.once('error', reject);
+        result.body.pipe(writeStream);
+      });
+      return { eTag, zipPath, status: result.status };
+    } else {
+      return { status: 500, error: { message: 'Response containing zip does not have a body' } };
+    }
+  } catch (e) {
+    return { status: 500, error: { message: `Error while trying to download the bot content: ${e}` } };
+  }
 };
 
 const xformJobToResult = (job: PVAPublishJob): PublishResult => {

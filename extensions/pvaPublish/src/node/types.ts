@@ -60,3 +60,11 @@ export type PublishResponse = {
 export type UserIdentity = {
   [key: string]: any;
 };
+
+export type PullResponse = {
+  error?: { message: string };
+  eTag?: string;
+  status: number;
+  /** Path to the pulled .zip containing updated bot content */
+  zipPath?: string;
+};
