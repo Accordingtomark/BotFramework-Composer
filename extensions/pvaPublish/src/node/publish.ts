@@ -17,7 +17,8 @@ import {
 
 const API_VERSION = '1';
 //const BASE_URL = `https://powerva.microsoft.com/api/botmanagement/v${API_VERSION}`; // prod / sdf
-const BASE_URL = `https://bots.int.customercareintelligence.net/api/botmanagement/v${API_VERSION}`; // int / ppe
+//const BASE_URL = `https://bots.int.customercareintelligence.net/api/botmanagement/v${API_VERSION}`; // int / ppe
+const BASE_URL = `https://bots.ppe.customercareintelligence.net/api/botmanagement/v${API_VERSION}`;
 const authCredentials = {
   clientId: 'ce48853e-0605-4f77-8746-d70ac63cc6bc',
   scopes: ['a522f059-bb65-47c0-8934-7db6e5286414/.default'], // int / ppe
@@ -31,7 +32,7 @@ export const publish = async (
   project: IBotProject,
   metadata: any,
   _user: UserIdentity,
-  { getAccessToken, loginAndGetIdToken }
+  getAccessToken
 ): Promise<PublishResponse> => {
   const {
     // these are provided by Composer
@@ -47,8 +48,7 @@ export const publish = async (
 
   try {
     // authenticate with PVA
-    const idToken = await loginAndGetIdToken(authCredentials);
-    const accessToken = await getAccessToken({ ...authCredentials, idToken });
+    const accessToken = await getAccessToken(authCredentials);
 
     // where we will store the bot .zip
     const zipDir = join(process.env.COMPOSER_TEMP_DIR as string, 'pva-publish');
@@ -132,7 +132,7 @@ export const getStatus = async (
   config: PublishConfig,
   project: IBotProject,
   user: UserIdentity,
-  { getAccessToken, loginAndGetIdToken }
+  getAccessToken
 ): Promise<PublishResponse> => {
   const {
     // these are provided by Composer
@@ -158,8 +158,7 @@ export const getStatus = async (
 
   try {
     // authenticate with PVA
-    const idToken = await loginAndGetIdToken(authCredentials);
-    const accessToken = await getAccessToken({ ...authCredentials, idToken });
+    const accessToken = await getAccessToken(authCredentials);
 
     // check the status for the publish job
     const url = `${BASE_URL}/environments/${envId}/bots/${botId}/composer/publishoperations/${operationId}`;
@@ -203,7 +202,7 @@ export const history = async (
   config: PublishConfig,
   _project: IBotProject,
   _user: UserIdentity,
-  { getAccessToken, loginAndGetIdToken }
+  getAccessToken
 ): Promise<PublishResult[]> => {
   const {
     // these are specific to the PVA publish profile shape
@@ -214,8 +213,7 @@ export const history = async (
 
   try {
     // authenticate with PVA
-    const idToken = await loginAndGetIdToken(authCredentials);
-    const accessToken = await getAccessToken({ ...authCredentials, idToken });
+    const accessToken = await getAccessToken(authCredentials);
 
     // get the publish history for the bot
     const url = `${BASE_URL}/environments/${envId}/bots/${botId}/composer/publishoperations`;
@@ -240,7 +238,7 @@ export const pull = async (
   config: PublishConfig,
   _project: IBotProject,
   _user: UserIdentity,
-  { getAccessToken, loginAndGetIdToken }
+  getAccessToken
 ): Promise<PullResponse> => {
   const {
     // these are specific to the PVA publish profile shape
@@ -250,8 +248,7 @@ export const pull = async (
   } = config;
   try {
     // authenticate with PVA
-    const idToken = await loginAndGetIdToken(authCredentials);
-    const accessToken = await getAccessToken({ ...authCredentials, idToken });
+    const accessToken = await getAccessToken(authCredentials);
     // fetch zip
     const url = `${BASE_URL}/api/botmanagement/v1/environments/${envId}/bots/${botId}/composer/content`;
     const options: RequestInit = {
