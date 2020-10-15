@@ -7,6 +7,7 @@
     "build:node": "tsc --project tsconfig.node.json"
   },
   "composer": {
+    "enabled": true,
     "bundles": [
       {
         "id": "publish",
@@ -15,13 +16,14 @@
     ],
     "contributes": {
       "views": {
-        "publish": {
+        "publish": [
+          {
           "bundleId": "publish"
-        }
+          }
+        ]
       }
     }
   },
-  "extendsComposer": true,
   "main": "dist/index.js",
   "dependencies": {
     "@bfc/extension-client": "file:../../packages/extension-client",
