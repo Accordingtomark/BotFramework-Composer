@@ -293,7 +293,7 @@ const xformJobToResult = (job: PVAPublishJob): PublishResult => {
     comment: job.comment,
     eTag: job.importedContentEtag,
     id: job.operationId, // what is this used for in Composer?
-    log: job.diagnostics.map((diag) => `---\n${JSON.stringify(diag, null, 2)}\n---\n`).join('\n'),
+    log: (job.diagnostics || []).map((diag) => `---\n${JSON.stringify(diag, null, 2)}\n---\n`).join('\n'),
     message: getUserFriendlyMessage(job.state),
     time: new Date(job.lastUpdateTimeUtc),
     status: getStatusFromJobState(job.state),
